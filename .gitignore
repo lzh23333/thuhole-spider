@@ -3,3 +3,4 @@ data/*
 posts/*
 .vscode/*
 comments/*
+*myconfig.json
