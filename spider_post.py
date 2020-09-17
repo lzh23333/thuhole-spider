@@ -1,5 +1,14 @@
-"""T大树洞爬虫
-"""
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+'''
+@file:  spider_post.py
+@introduction: T大树洞爬虫，爬取帖子部分
+@time:  2020/09/17 23:41:02
+@author:  lzh
+@version:  1.0
+'''
+
+
 import json
 import argparse
 import os
@@ -10,7 +19,7 @@ from utils import spider_one_page
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="T大树洞爬虫, 程序会自动爬取帖子以及对应评论内容")
+    parser = argparse.ArgumentParser(description="T大树洞爬虫, 程序会自动爬取帖子内容")
     parser.add_argument("--start", help="爬取帖子索引最大值，若不指定，默认为最新帖子的id",
                         type=int)
     parser.add_argument("--end",

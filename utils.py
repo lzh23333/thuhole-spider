@@ -82,13 +82,14 @@ def spider_comments(pid_list, getcomment_url, folder):
     Raises:
         AssertError: pid_list中数目超过最大容许的数目.
     """
-    assert len(pid_list) > 30, "pid list中的id数不得高于30"
+    assert len(pid_list) <= 30, "pid list中的id数不得高于30"
 
     def comment_dump(pid):
         """ 根据pid获取单个评论内容，并保存
         """
         commment = getcomment(pid, getcomment_url)
-        with open(os.path.join(folder, f"c{pid}.json"), 'w') as f:
+        
+        with open(os.path.join(folder, f"c{pid}.json"), 'w', encoding='utf-8') as f:
             f.write(commment)
     for pid in pid_list:
         t = threading.Thread(target=comment_dump, args=(pid, ))

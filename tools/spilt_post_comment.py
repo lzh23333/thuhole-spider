@@ -33,4 +33,4 @@ for filename in tqdm(os.listdir(folder)):
     with open(post_file, 'w') as f:
         f.write(json.dumps(post))
     with open(comment_file, 'w') as f:
-        f.write(json.dumps(comment_file))
+        f.write(json.dumps(comments))
