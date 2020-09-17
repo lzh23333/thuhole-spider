@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import threading
 
 
 HEADERS = {
@@ -47,21 +48,26 @@ def spider_one_page(page, getcomment_url, folder, pid_list):
         end: 爬取帖子id最小值
         start: 爬取帖子id最大值
     Returns:
-        max_pid, min_pid: 该页面pid最大最小值
+        count: 该页中包含读取帖子的个数
     """
     page = json.loads(page, encoding='utf-8')
     page_data = page['data']
-    if page_data != []:
-        for post in page_data:
-            pid = post['pid']
-            if pid not in pid_list:
-                comment = getcomment(pid, getcomment_url)
-                post['comment'] = json.loads(comment, encoding='utf-8')
-                dst = os.path.join(folder, f"{pid}.json")
-                with open(dst, 'w', encoding='utf-8') as f:
-                    f.write(json.dumps(post, ensure_ascii=False))
+    post_list = filter(lambda x: int(x['pid']) not in pid_list, page_data)
+    post_list = list(post_list)
+    def post_dump(post):
+        # 包装为小线程
+        pid = post['pid']
+        
+        comment = getcomment(pid, getcomment_url)
+        post['comment'] = json.loads(comment, encoding='utf-8')
+        dst = os.path.join(folder, f"{pid}.json")
+        with open(dst, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(post, ensure_ascii=False))
+        # print(f"pid: {pid} post download done")
+    for post in post_list:
+        t = threading.Thread(target=post_dump, args=(post, ))
+        t.start()
     
-        pid_list = [int(x['pid']) for x in page_data]
-        return max(pid_list), min(pid_list)
-    else:
-        return -1, -1
+    return len(post_list)
+
+

@@ -20,7 +20,8 @@ if __name__ == "__main__":
                         default="./config.json")
     parser.add_argument("--store-path", help="数据存储目录",
                         default="./posts")
-    parser.add_argument("--sleep", help="爬取一次页面后休眠时间/s", type=int, default=20)
+    parser.add_argument("--sleep-factor", help="爬取一个未曾读取的帖子后休眠时间/s",
+                        type=int, default=1)
     args = parser.parse_args()
 
     config_file = args.config
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     getlist_url = (f"{config['api_url']}&action=getlist"
                 f"&user_token={config['user_token']}")
     store_path = args.store_path
-    sleep_time = args.sleep
+    sleep_factor = args.sleep_factor
 
     # 获取最新帖子pid
     max_pid = 0
@@ -44,39 +45,25 @@ if __name__ == "__main__":
     page = json.loads(page, encoding='utf-8')
     max_pid = max(map(lambda x: int(x['pid']), page['data']))
 
-    # 确认爬取帖子索引最小值
-    # if end is None:
-    #     filenames = os.listdir(store_path)
-    #     path_exist = os.path.exists(store_path)
-    #     if path_exist and len(filenames) != 0:
-    #         end = max(map(lambda x: int(x.split('.')[0]), filenames))
-    #     elif not path_exist:
-    #         os.makedirs(store_path)
-    #         end = 0
-    #     else:
-    #         end = 0
-
     # 获取已爬取的帖子
     if os.path.exists(store_path):
-        pid_list = map(lambda x: int(x.split('.')[0]),
-                       os.listdir(store_path))
+        pid_list = list(map(lambda x: int(x.split('.')[0]),
+                            os.listdir(store_path)))
     else:
         os.makedirs(store_path)
         pid_list = []
-
+    print(len(pid_list), max(pid_list))
+    
     # 爬取页面
-    p = 1
+    p = 478
     page_num = max_pid // 30 + 1
-    for p in tqdm(range(1, page_num + 1)):
+    for p in tqdm(range(p, page_num + 1)):
         start_t = time.time()
         page = getlist(p, getlist_url)
 
-        max_id, min_id = spider_one_page(page, getcomment_url,
+        count = spider_one_page(page, getcomment_url,
                                         store_path, pid_list)
-        # print((f"page: {p}, pid range: "
-        #     f"({max_id}, {min_id})"
-        #     f", cost time: {time.time() - start} s"))
-        time.sleep(sleep_time)
+        time.sleep(1 + count * sleep_factor)
 
     
         
