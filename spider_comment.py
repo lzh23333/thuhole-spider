@@ -59,6 +59,7 @@ if __name__ == "__main__":
     max_pid = 0
     page = getlist(1, getlist_url)
     page = json.loads(page, encoding='utf-8')
+    print(page)
     max_pid = max(map(lambda x: int(x['pid']), page['data']))
     start_pid = max_pid if args.start is None else args.start
     end_pid = args.end if args.end is not None else 1
