@@ -14,7 +14,7 @@ import argparse
 import os
 import time
 from tqdm import tqdm
-from utils import getcomment, getlist
+from utils import getlist
 from utils import spider_comments
 
 
@@ -54,6 +54,8 @@ if __name__ == "__main__":
                 f"&user_token={config['user_token']}")
     store_path = args.store_path
     sleep_factor = args.sleep_factor
+    if not os.path.exists(store_path):
+        os.makedirs(store_path)
 
     # 获取最新帖子pid
     max_pid = 0
@@ -74,10 +76,10 @@ if __name__ == "__main__":
             spider_comments(range(s, s + n), getcomment_url, store_path)
             time.sleep(n * sleep_factor)
             s += n
-            
+
             if s > start_pid:
                 pbar.update(s - start_pid)
                 break
             else:
                 pbar.update(n)
-            
+

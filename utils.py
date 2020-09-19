@@ -56,16 +56,14 @@ def spider_one_page(p, getlist_url, folder, pid_list=None):
         pid_list = []
     post_list = filter(lambda x: int(x['pid']) not in pid_list, page_data)
     post_list = list(post_list)
+
     def post_dump(post):
         # 包装为小线程
         pid = post['pid']
-        
-        # comment = getcomment(pid, getcomment_url)
-        # post['comment'] = json.loads(comment, encoding='utf-8')
         dst = os.path.join(folder, f"{pid}.json")
         with open(dst, 'w', encoding='utf-8') as f:
             f.write(json.dumps(post, ensure_ascii=False))
-        # print(f"pid: {pid} post download done")
+
     for post in post_list:
         t = threading.Thread(target=post_dump, args=(post, ))
         t.start()
@@ -88,9 +86,10 @@ def spider_comments(pid_list, getcomment_url, folder):
         """ 根据pid获取单个评论内容，并保存
         """
         commment = getcomment(pid, getcomment_url)
-
-        with open(os.path.join(folder, f"c{pid}.json"), 'w', encoding='utf-8') as f:
+        filename = os.path.join(folder, f"c{pid}.json")
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(commment)
+            # print(pid)
     t_list = []
     for pid in pid_list:
         t = threading.Thread(target=comment_dump, args=(pid, ))
@@ -98,4 +97,3 @@ def spider_comments(pid_list, getcomment_url, folder):
         t.start()
     for t in t_list:
         t.join()
-    

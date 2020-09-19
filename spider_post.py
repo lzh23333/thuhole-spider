@@ -14,7 +14,7 @@ import argparse
 import os
 import time
 from tqdm import tqdm
-from utils import getcomment, getlist
+from utils import getlist
 from utils import spider_one_page
 
 
